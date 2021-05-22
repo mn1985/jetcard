@@ -163,17 +163,17 @@ sudo systemctl enable jetcard_jupyter
 sudo systemctl start jetcard_jupyter
 
 # Make swapfile
-echo "\e[46m Make swapfile \e[0m"
-cd
-if [ ! -f /var/swapfile ]; then
-	sudo fallocate -l 4G /var/swapfile
-	sudo chmod 600 /var/swapfile
-	sudo mkswap /var/swapfile
-	sudo swapon /var/swapfile
-	sudo bash -c 'echo "/var/swapfile swap swap defaults 0 0" >> /etc/fstab'
-else
-	echo "Swapfile already exists"
-fi
+#echo "\e[46m Make swapfile \e[0m"
+#cd
+#if [ ! -f /var/swapfile ]; then
+#	sudo fallocate -l 4G /var/swapfile
+#	sudo chmod 600 /var/swapfile
+#	sudo mkswap /var/swapfile
+#	sudo swapon /var/swapfile
+#	sudo bash -c 'echo "/var/swapfile swap swap defaults 0 0" >> /etc/fstab'
+#else
+#	echo "Swapfile already exists"
+#fi
 
 
 
