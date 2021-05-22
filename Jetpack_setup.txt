@@ -1,0 +1,88 @@
+1.SDカードのフォーマット
+diskpart
+select disk n
+clean
+create partition primary
+フォーマット
+
+2.EtcherでJetPackのSD Card imageを書き込み
+https://developer.nvidia.com/embedded/jetpack
+　JetPack：OS, TensorRT, cuDNN, CUDA, MultimediaAPI, ComputerVision(VisionWorks, OpenCV, VPI), 
+           DeveloperTools(CUDA, NsightSystems, NsightGraphics), 
+           SupportedSDKs(PowerEstimator, DeepStream)
+
+(ヘッドレスモードor通常モード)
+3.Jetson nanoを起動, マイクロUSBでPCと接続、Serial通信で接続し、セットアップ
+
+4.起動後、下記の手順で行う。手順書は下記で読める。
+$ sudo mount -o ro /opt/nvidia/l4t-usb-device-mode/filesystem.img /mnt
+$ less /mnt/README-vnc.txt
+
+5.下記の手順でVNCを有効化
+Vinoのインストール・自動起動の設定
+$ sudo apt update
+$ sudo apt install vino
+$ mkdir -p ~/.config/autostart
+$ cp /usr/share/applications/vino-server.desktop ~/.config/autostart
+
+$ sudo vi /usr/share/glib-2.0/schemas/org.gnome.Vino.gschema.xml
+     <key name='enabled' type='b'>
+      <summary>Enable remote access to the desktop</summary>
+        <description>
+          If true, allows remote access to the desktop via the RFB
+          protocol. Users on remote machines may then connect to the
+          desktop using a VNC viewer.
+        </description>
+      <default>false</default>
+    </key>
+
+Vinoのコンフィグレーション
+$ gsettings set org.gnome.Vino prompt-enabled false
+$ gsettings set org.gnome.Vino require-encryption false
+$ gsettings set org.gnome.Vino authentication-methods "['vnc']"
+$ gsettings set org.gnome.Vino vnc-password $(echo -n "password"|base64)	# "password"を書き換え
+
+自動ログインの設定
+$ sudo vi /etc/gdm3/custom.conf
+-#  AutomaticLoginEnable = true
+-#  AutomaticLogin = user1
++AutomaticLoginEnable = true
++AutomaticLogin = xxx	#xxxはユーザー名
+
+解像度設定
+$ sudo vi /etc/X11/xorg.conf
+Section "Screen"
+   Identifier    "Default Screen"
+   Monitor       "Configured Monitor"
+   Device        "Tegra0"
+   SubSection "Display"
+       Depth    24
+       Virtual 1280 800 # Modify the resolution by editing these values
+   EndSubSection
+EndSection
+
+$ sudo reboot
+
+6.SWAP設定(セットアップ時にやっていたら飛ばす)
+＄sudo swapoff -a
+＄sudo fallocate -l 6G /swapfile	# swap領域の確保（6GBの場合、通常４か６）
+＄sudo chmod 600 /swapfile
+＄sudo mkswap /swapfile
+＄sudo swapon /swapfile
+＄grep SwapTotal /proc/meminfo
+＄free -h
+
+解除と削除
+＄sudo swapoff -a
+＄rm  /swapfile
+
+恒久的に設定
+＄sudo cp -p /etc/fstab{,.bak}
+＄echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab /swapfile none swap sw 0 0 
+
+恒久設定の解除
+＄sudo mv /etc/fstab{.bak,}
+
+
+7.JetCardを利用
+git clone https://github.com/NVIDIA-AI-IOT/jetcard.git
