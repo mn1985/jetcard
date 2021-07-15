@@ -98,7 +98,7 @@ jupyter lab --generate-config
 python3 -c "from notebook.auth.security import set_password; set_password('$password', '$HOME/.jupyter/jupyter_notebook_config.json')"
 
 # fix for Traitlet permission error
-#sudo chown -R jetson:jetson ~/.local/share/
+#sudo chown -R $password:$password ~/.local/share/
 
 # Install jupyter_clickable_image_widget
 echo "\e[42m Install jupyter_clickable_image_widget \e[0m"
